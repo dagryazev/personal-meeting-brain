@@ -24,22 +24,22 @@ from meeting_brain.db import connect
 import rate_limit
 
 SAMPLE_QUESTIONS = [
-    "Что обсуждали на постмортеме по падению базы?",
-    "Какие приоритеты у клиента Acme?",
-    "Что решили по найму бэкенд-инженера?",
-    "Почему выбрали TimescaleDB, а не ClickHouse?",
-    "Какой план на квартал по интеграциям с маркетплейсами?",
+    "What was discussed in the database outage postmortem?",
+    "What are Acme's top priorities as a customer?",
+    "What was decided about hiring the backend engineer?",
+    "Why did the team pick TimescaleDB over ClickHouse?",
+    "What is the quarterly plan for marketplace integrations?",
 ]
 
-SYSTEM_PROMPT = """Ты — ассистент по корпоративным митингам. Отвечай на вопрос пользователя,
-используя ТОЛЬКО содержимое предоставленных фрагментов транскриптов.
+SYSTEM_PROMPT = """You are an assistant for browsing meeting transcripts. Answer the user's
+question using ONLY the content of the supplied transcript fragments.
 
-Правила:
-1. Для каждого факта указывай источник в формате [N], где N — номер фрагмента.
-2. Если в фрагментах нет ответа — честно скажи: "Не нашёл этого в транскриптах".
-3. Не выдумывай детали, не упомянутые во фрагментах.
-4. Отвечай на том же языке, что и вопрос.
-5. Будь кратким, но информативным. Маркированные списки приветствуются."""
+Rules:
+1. Cite every fact in the form [N], where N is the fragment number.
+2. If the fragments do not contain an answer, say plainly: "Not found in the transcripts".
+3. Do not invent details that are not in the fragments.
+4. Answer in the same language the user asked in.
+5. Be concise but informative. Bullet lists are welcome."""
 
 
 # ---------------------------------------------------------------------------
@@ -77,16 +77,12 @@ def _client_ip() -> str:
         headers = dict(st.context.headers or {})
     except Exception:
         headers = {}
-    # Header lookup is case-insensitive in practice but defensive here.
     xff = headers.get("X-Forwarded-For") or headers.get("x-forwarded-for")
     if xff:
-        # XFF is a comma-separated list, leftmost = original client.
         return xff.split(",")[0].strip()
     real = headers.get("X-Real-IP") or headers.get("x-real-ip")
     if real:
         return real.strip()
-    # No proxy headers — running locally. Treat the whole local instance
-    # as a single bucket (matches the "one user" expectation).
     return "local"
 
 
@@ -107,7 +103,7 @@ def _index_stats() -> tuple[int, int]:
 def _build_context(hits: list[search.SearchHit]) -> str:
     parts: list[str] = []
     for i, h in enumerate(hits, start=1):
-        header = f"[{i}] ({h.meeting_date or 'без даты'} — {h.title or 'без названия'})"
+        header = f"[{i}] ({h.meeting_date or 'undated'} — {h.title or 'untitled'})"
         parts.append(f"{header}\n{h.snippet}")
     return "\n\n".join(parts)
 
@@ -115,17 +111,17 @@ def _build_context(hits: list[search.SearchHit]) -> str:
 def _stream_answer(query: str, hits: list[search.SearchHit]) -> Iterable[str]:
     client = _gemini_client()
     if client is None:
-        yield "**GEMINI_API_KEY не задан.** Добавь ключ в переменные окружения и перезапусти приложение."
+        yield "**GEMINI_API_KEY is not set.** Add the key to your environment and restart the app."
         return
 
     if not hits:
-        yield "Не нашёл подходящих фрагментов в индексе. Попробуй переформулировать вопрос или расширить диапазон дат."
+        yield "No relevant fragments found in the index. Try rephrasing the question or widening the date range."
         return
 
     context = _build_context(hits)
     user_message = (
-        f"Фрагменты транскриптов:\n\n{context}\n\n"
-        f"Вопрос пользователя: {query}"
+        f"Transcript fragments:\n\n{context}\n\n"
+        f"User question: {query}"
     )
 
     try:
@@ -138,7 +134,7 @@ def _stream_answer(query: str, hits: list[search.SearchHit]) -> Iterable[str]:
             if chunk.text:
                 yield chunk.text
     except Exception as exc:
-        yield f"\n\n_Ошибка при обращении к Gemini: {exc}_"
+        yield f"\n\n_Gemini call failed: {exc}_"
 
 
 # ---------------------------------------------------------------------------
@@ -153,52 +149,52 @@ st.set_page_config(
 
 st.title("Personal Meeting Brain")
 st.caption(
-    "Локальный RAG над транскриптами митингов. SQLite + sqlite-vec для хранения, "
-    "Voyage AI `voyage-3` для embeddings, Gemini 2.5 Flash для генерации."
+    "Local RAG over meeting transcripts. SQLite + sqlite-vec for storage, "
+    "Voyage AI `voyage-3` for embeddings, Gemini 2.5 Flash for generation."
 )
 
 # Top stats bar
 meetings_count, chunks_count = _index_stats()
 c1, c2, c3 = st.columns(3)
-c1.metric("Митингов в индексе", meetings_count)
-c2.metric("Чанков (≈512 токенов)", chunks_count)
+c1.metric("Meetings indexed", meetings_count)
+c2.metric("Chunks (≈512 tokens)", chunks_count)
 c3.metric("Embedding model", "voyage-3 (1024d)")
 
 if meetings_count == 0:
     st.warning(
-        "Индекс пуст. Положи `.md` транскрипты в `transcripts/` и запусти "
-        "`uv run meeting-brain-ingest` (требуется `VOYAGE_API_KEY`)."
+        "Index is empty. Drop `.md` transcripts into `transcripts/` and run "
+        "`uv run meeting-brain-ingest` (requires `VOYAGE_API_KEY`)."
     )
 
 # Sidebar controls
 with st.sidebar:
-    st.header("Параметры поиска")
-    top_k = st.slider("Top-K чанков для контекста", min_value=3, max_value=15, value=6)
-    use_date_filter = st.checkbox("Фильтр по дате")
+    st.header("Search parameters")
+    top_k = st.slider("Top-K chunks for context", min_value=3, max_value=15, value=6)
+    use_date_filter = st.checkbox("Filter by date")
     date_from_str: str | None = None
     date_to_str: str | None = None
     if use_date_filter:
         today = date.today()
-        df = st.date_input("От", value=date(today.year - 1, today.month, today.day))
-        dt = st.date_input("До", value=today)
+        df = st.date_input("From", value=date(today.year - 1, today.month, today.day))
+        dt = st.date_input("To", value=today)
         date_from_str = df.isoformat()
         date_to_str = dt.isoformat()
 
     st.divider()
-    st.subheader("Примеры вопросов")
+    st.subheader("Example questions")
     for q in SAMPLE_QUESTIONS:
         if st.button(q, use_container_width=True, key=f"sample-{hash(q)}"):
             st.session_state["query"] = q
 
 # Query input
 query = st.text_input(
-    "Спроси про митинги:",
+    "Ask about the meetings:",
     value=st.session_state.get("query", ""),
-    placeholder="Например: что решили по архивации событий?",
+    placeholder="e.g. What did we decide about archiving events?",
     key="query",
 )
 
-ask = st.button("Найти и ответить", type="primary", disabled=not query.strip())
+ask = st.button("Search & answer", type="primary", disabled=not query.strip())
 
 # ---------------------------------------------------------------------------
 # Run
@@ -210,7 +206,7 @@ if ask and query.strip():
     if not decision.allowed:
         st.divider()
         st.error(
-            f"{decision.reason} Попробуй снова через {decision.retry_after_s} с."
+            f"{decision.reason} Try again in {decision.retry_after_s}s."
         )
         st.stop()
 
@@ -229,11 +225,11 @@ if ask and query.strip():
     search_ms = (time.perf_counter() - t_search) * 1000
 
     st.divider()
-    st.subheader("Ответ")
+    st.subheader("Answer")
     st.caption(
-        f"Найдено фрагментов: {len(hits)} · поиск занял {search_ms:.0f} мс · "
-        f"осталось {decision.remaining_minute}/мин, "
-        f"{decision.remaining_hour}/час, {decision.remaining_day}/сутки с этого IP"
+        f"Fragments retrieved: {len(hits)} · search took {search_ms:.0f} ms · "
+        f"{decision.remaining_minute}/min, "
+        f"{decision.remaining_hour}/hour, {decision.remaining_day}/day left from this IP"
     )
 
     answer_placeholder = st.empty()
@@ -245,39 +241,39 @@ if ask and query.strip():
         answer_placeholder.markdown(full_answer)
     gen_ms = (time.perf_counter() - t_gen) * 1000
 
-    st.caption(f"Генерация заняла {gen_ms:.0f} мс")
+    st.caption(f"Generation took {gen_ms:.0f} ms")
 
     if hits:
-        st.subheader("Источники")
+        st.subheader("Sources")
         for i, h in enumerate(hits, start=1):
             with st.expander(
-                f"[{i}] {h.meeting_date or 'без даты'} — {h.title or h.source_path} "
+                f"[{i}] {h.meeting_date or 'undated'} — {h.title or h.source_path} "
                 f"· score={h.score:.3f}"
             ):
                 meta_cols = st.columns(3)
-                meta_cols[0].markdown(f"**Дата:** {h.meeting_date or '—'}")
+                meta_cols[0].markdown(f"**Date:** {h.meeting_date or '—'}")
                 meta_cols[1].markdown(f"**Chunk #:** {h.chunk_index}")
                 meta_cols[2].markdown(f"**Score (cosine dist):** {h.score:.4f}")
-                st.markdown("**Фрагмент:**")
+                st.markdown("**Fragment:**")
                 st.markdown(f"> {h.snippet}")
-                st.caption(f"Источник: `{h.source_path}`")
+                st.caption(f"Source: `{h.source_path}`")
 
 with st.sidebar:
     st.divider()
     rem_min, rem_hour, rem_day = rate_limit.snapshot(_client_ip())
     st.caption(
-        f"Бюджет с этого IP: **{rem_min}** в минуте · "
-        f"**{rem_hour}** в часу · **{rem_day}** в сутки."
+        f"Budget from this IP: **{rem_min}** this minute · "
+        f"**{rem_hour}** this hour · **{rem_day}** today."
     )
-    with st.expander("Как это работает"):
+    with st.expander("How it works"):
         st.markdown(
             """
-1. Вопрос эмбеддится через `voyage-3` (`input_type=query`).
-2. SQLite + `sqlite-vec` находит K ближайших чанков по cosine distance.
-3. Найденные чанки + вопрос подаются в Gemini 2.5 Flash с инструкцией цитировать источники.
-4. Ответ стримится в UI, источники раскрываются ниже.
+1. The question is embedded via `voyage-3` (`input_type=query`).
+2. SQLite + `sqlite-vec` finds the K nearest chunks by cosine distance.
+3. Retrieved chunks plus the question are sent to Gemini 2.5 Flash with an instruction to cite sources.
+4. The answer streams into the UI; sources expand below.
 
-Эмбеддинги документов делаются однократно при ingest'е (`input_type=document`).
-Это асимметричное encoding даёт заметно лучшую релевантность, чем общий encoder.
+Document embeddings are computed once at ingest time (`input_type=document`).
+This asymmetric encoding noticeably improves relevance over using one encoder for both.
             """
         )

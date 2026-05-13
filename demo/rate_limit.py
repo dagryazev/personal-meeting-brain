@@ -77,10 +77,13 @@ def _prune(q: deque[float], cutoff: float) -> None:
 
 def _format_window(window_s: int) -> str:
     if window_s >= 86400:
-        return f"{window_s // 86400} сут"
+        n = window_s // 86400
+        return f"{n} day" if n == 1 else f"{n} days"
     if window_s >= 3600:
-        return f"{window_s // 3600} час"
-    return f"{window_s // 60} мин"
+        n = window_s // 3600
+        return f"{n} hour" if n == 1 else f"{n} hours"
+    n = window_s // 60
+    return f"{n} minute" if n == 1 else f"{n} minutes"
 
 
 def check(ip: str) -> Decision:
@@ -106,8 +109,8 @@ def check(ip: str) -> Decision:
                 return Decision(
                     allowed=False,
                     reason=(
-                        f"Превышен лимит: {limit} запросов в {_format_window(window)} "
-                        f"с одного IP."
+                        f"Rate limit hit: {limit} requests per {_format_window(window)} "
+                        f"from a single IP."
                     ),
                     retry_after_s=max(wait, 1),
                 )
@@ -121,8 +124,8 @@ def check(ip: str) -> Decision:
                 return Decision(
                     allowed=False,
                     reason=(
-                        f"Сервис принимает не более {limit} запросов в "
-                        f"{_format_window(window)} суммарно. Попробуй позже."
+                        f"Service-wide cap reached: {limit} requests per "
+                        f"{_format_window(window)}. Try again later."
                     ),
                     retry_after_s=max(wait, 1),
                 )
