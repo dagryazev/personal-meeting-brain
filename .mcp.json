@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "meeting-brain": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/Users/denis/AiProjects/personal-meeting-brain",
+        "run",
+        "meeting-brain-mcp"
+      ]
+    }
+  }
+}
