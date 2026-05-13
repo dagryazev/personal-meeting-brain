@@ -9,8 +9,6 @@
 *.egg-info
 data/*.db
 data/*.db-*
-transcripts/*.md
-!demo/transcripts/*.md
 .mcp.json
 tests
 README.md

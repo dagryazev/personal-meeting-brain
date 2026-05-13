@@ -3,8 +3,6 @@
 __pycache__/
 data/*.db
 data/*.db-*
-transcripts/*.md
-!demo/transcripts/*.md
 *.egg-info/
 .pytest_cache/
 .ruff_cache/

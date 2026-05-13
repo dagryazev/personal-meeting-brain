@@ -86,8 +86,8 @@ There is a self-contained web demo that showcases the RAG loop end-to-end: type 
 cp .env.example .env
 # Edit .env: set VOYAGE_API_KEY and GEMINI_API_KEY
 
-# 2. Ingest the bundled demo transcripts (8 fictional meetings)
-MEETING_BRAIN_TRANSCRIPTS_DIR=$PWD/demo/transcripts uv run meeting-brain-ingest
+# 2. Ingest the bundled transcripts (8 fictional meetings live in transcripts/)
+uv run meeting-brain-ingest
 
 # 3. Launch
 uv run streamlit run demo/app.py
@@ -113,4 +113,4 @@ Public URL appears once the health check (`/_stcore/health`) passes.
 
 ### Demo transcripts
 
-The 8 transcripts in `demo/transcripts/` are entirely fictional (made-up startup "Lumora", invented people) and exist solely to demonstrate the retrieval quality. Replace them with your own when you have real data — and remember to update `.gitignore` if those transcripts are private.
+The 8 transcripts in `transcripts/` are entirely fictional (made-up startup, invented people) and exist solely to demonstrate the retrieval quality. Replace them with your own when you have real data — and remember to update `.gitignore` (re-add `transcripts/*.md`) if those transcripts are private.

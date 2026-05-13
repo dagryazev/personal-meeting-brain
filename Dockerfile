@@ -37,12 +37,12 @@ WORKDIR /app
 COPY --from=builder /app/.venv /app/.venv
 COPY src ./src
 COPY demo ./demo
+COPY transcripts ./transcripts
 
-# Bundle demo transcripts into the image so the container can self-bootstrap
-# without any external mount. On Railway, /app/data is mounted as a volume
-# (persistent SQLite); /app/transcripts stays read-only inside the image.
-RUN mkdir -p /app/transcripts /app/data \
-    && cp -r /app/demo/transcripts/. /app/transcripts/
+# /app/data holds the SQLite index — on Railway, mount a Volume here so the
+# index survives redeploys. /app/transcripts is shipped read-only inside the
+# image (the demo fixture transcripts).
+RUN mkdir -p /app/data
 
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
