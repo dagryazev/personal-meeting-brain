@@ -233,7 +233,7 @@ if ask and query.strip():
     st.caption(
         f"Найдено фрагментов: {len(hits)} · поиск занял {search_ms:.0f} мс · "
         f"осталось {decision.remaining_minute}/мин, "
-        f"{decision.remaining_hour}/час с этого IP"
+        f"{decision.remaining_hour}/час, {decision.remaining_day}/сутки с этого IP"
     )
 
     answer_placeholder = st.empty()
@@ -264,10 +264,10 @@ if ask and query.strip():
 
 with st.sidebar:
     st.divider()
-    rem_min, rem_hour = rate_limit.snapshot(_client_ip())
+    rem_min, rem_hour, rem_day = rate_limit.snapshot(_client_ip())
     st.caption(
-        f"Бюджет с этого IP: **{rem_min}** запросов в текущей минуте, "
-        f"**{rem_hour}** в часу."
+        f"Бюджет с этого IP: **{rem_min}** в минуте · "
+        f"**{rem_hour}** в часу · **{rem_day}** в сутки."
     )
     with st.expander("Как это работает"):
         st.markdown(
