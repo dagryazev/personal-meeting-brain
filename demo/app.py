@@ -21,6 +21,8 @@ import streamlit as st
 from meeting_brain import search
 from meeting_brain.db import connect
 
+import rate_limit
+
 SAMPLE_QUESTIONS = [
     "Что обсуждали на постмортеме по падению базы?",
     "Какие приоритеты у клиента Acme?",
@@ -62,6 +64,30 @@ def _open_conn() -> sqlite3.Connection:
     per-run is the safe pattern.
     """
     return connect()
+
+
+def _client_ip() -> str:
+    """Best-effort client IP for rate limiting.
+
+    Behind Railway / typical reverse proxies, the original IP arrives in
+    X-Forwarded-For. Fall back to X-Real-IP, then a stable session marker
+    so two anonymous local users still get separate buckets.
+    """
+    try:
+        headers = dict(st.context.headers or {})
+    except Exception:
+        headers = {}
+    # Header lookup is case-insensitive in practice but defensive here.
+    xff = headers.get("X-Forwarded-For") or headers.get("x-forwarded-for")
+    if xff:
+        # XFF is a comma-separated list, leftmost = original client.
+        return xff.split(",")[0].strip()
+    real = headers.get("X-Real-IP") or headers.get("x-real-ip")
+    if real:
+        return real.strip()
+    # No proxy headers — running locally. Treat the whole local instance
+    # as a single bucket (matches the "one user" expectation).
+    return "local"
 
 
 def _index_stats() -> tuple[int, int]:
@@ -179,6 +205,15 @@ ask = st.button("Найти и ответить", type="primary", disabled=not q
 # ---------------------------------------------------------------------------
 
 if ask and query.strip():
+    ip = _client_ip()
+    decision = rate_limit.check(ip)
+    if not decision.allowed:
+        st.divider()
+        st.error(
+            f"{decision.reason} Попробуй снова через {decision.retry_after_s} с."
+        )
+        st.stop()
+
     t_search = time.perf_counter()
     conn = _open_conn()
     try:
@@ -195,7 +230,11 @@ if ask and query.strip():
 
     st.divider()
     st.subheader("Ответ")
-    st.caption(f"Найдено фрагментов: {len(hits)} · поиск занял {search_ms:.0f} мс")
+    st.caption(
+        f"Найдено фрагментов: {len(hits)} · поиск занял {search_ms:.0f} мс · "
+        f"осталось {decision.remaining_minute}/мин, "
+        f"{decision.remaining_hour}/час с этого IP"
+    )
 
     answer_placeholder = st.empty()
 
@@ -225,6 +264,11 @@ if ask and query.strip():
 
 with st.sidebar:
     st.divider()
+    rem_min, rem_hour = rate_limit.snapshot(_client_ip())
+    st.caption(
+        f"Бюджет с этого IP: **{rem_min}** запросов в текущей минуте, "
+        f"**{rem_hour}** в часу."
+    )
     with st.expander("Как это работает"):
         st.markdown(
             """
