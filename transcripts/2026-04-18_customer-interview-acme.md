@@ -1,44 +1,44 @@
 # Customer Interview — Acme Logistics
 
-**Дата:** 2026-04-18
-**Участники:** Денис, Соня, Виктор Орлов (Head of Ops, Acme Logistics)
+**Date:** 2026-04-18
+**Attendees:** Denis, Sonya, Viktor Orlov (Head of Ops, Acme Logistics)
 
 ---
 
-**Денис:** Виктор, спасибо что согласился. Мы хотим понять, как ваша команда работает с нашей системой после первого месяца, что болит, что нравится.
+**Denis:** Viktor, thanks for taking the time. We want to understand how your team is working with our system after the first month — what hurts, what works.
 
-**Виктор:** Хорошо. Если коротко — мы довольны, но есть три большие боли.
+**Viktor:** Sure. Short version — we're happy, but there are three big pains.
 
-**Денис:** Слушаем.
+**Denis:** Listening.
 
-**Виктор:** Первое — отчёты. Нам нужны не PDF, а Excel с возможностью править формулы. Сейчас выгрузка в CSV есть, но клиенты — наши клиенты — присылают эти CSV обратно с правками, и мы вручную сводим. Если бы можно было сразу скачивать xlsx с протянутыми формулами, это сэкономило бы оператору день в неделю.
+**Viktor:** First — reports. We need Excel, not PDF, with editable formulas. CSV export exists today, but our customers — our customers — send those CSVs back with edits, and we merge by hand. If we could download xlsx with formulas already wired up, that would save an operator a full day a week.
 
-**Соня:** Записала. Excel-выгрузка с шаблонами формул.
+**Sonya:** Noted. Excel export with formula templates.
 
-**Виктор:** Второе — мобильный интерфейс для кладовщиков. На складе планшеты, и веб-интерфейс на них тормозит. Особенно поиск товара по штрихкоду — после сканирования экран обновляется секунд пять.
+**Viktor:** Second — mobile UI for warehouse staff. They're on tablets in the warehouse, and the web UI is slow on them. Especially barcode product lookup — the screen takes five seconds to refresh after a scan.
 
-**Денис:** Это известная проблема, мы как раз сейчас профилируем фронт. По нашим замерам, бутылочное горлышко — не сеть, а рендер большой таблицы. Если соберём отдельную мобильную вьюшку, будет летать.
+**Denis:** That's a known problem, we're profiling the frontend right now. Our measurements say the bottleneck isn't the network, it's rendering a large table. If we ship a dedicated mobile view, it'll fly.
 
-**Виктор:** Если выкатите за квартал — мы готовы доплатить за приоритет.
+**Viktor:** If you ship that this quarter, we're willing to pay extra to prioritize.
 
-**Денис:** Поговорим отдельно. Третья боль?
+**Denis:** Let's talk separately. Third pain?
 
-**Виктор:** Учёт серийных номеров. У нас часть товара — электроника, и каждый юнит идёт со своим serial. Сейчас мы их пишем в свободное текстовое поле, и потом не можем найти историю конкретного юнита. Хотелось бы первый класс под serial-номера.
+**Viktor:** Serial number tracking. Part of our inventory is electronics, each unit has a serial. Today we put them in a free-text field and can't search the history of a specific unit afterwards. We'd want first-class serial-number support.
 
-**Соня:** Это структурное изменение модели данных, верно?
+**Sonya:** That's a structural data-model change, right?
 
-**Денис:** Да. Это полугодовой проект, но я его держу в backlog с прошлой осени. После твоего запроса это, пожалуй, перевешивает чашу.
+**Denis:** Yes. That's a half-year project, but I've kept it in the backlog since last autumn. After your ask, it's probably tipping the scale.
 
-**Виктор:** И небольшое — название поля "Юридическое лицо контрагента" слишком длинное, в таблице обрезается.
+**Viktor:** And a small one — the field label "Counterparty legal entity" is too long, it truncates in the table.
 
-**Соня:** Это исправим за день.
+**Sonya:** That we'll fix in a day.
 
-**Денис:** Виктор, что нравится?
+**Denis:** Viktor, what's working well for you?
 
-**Виктор:** Интеграция с 1С через коннектор. Работает железно, в отличие от того, что у нас было раньше. И поддержка отвечает — Аня помогала с настройкой импорта, разобрались за полчаса в чате.
+**Viktor:** The 1C integration via the connector. Rock solid, unlike what we had before. And support is responsive — Anya helped us with import setup, sorted it in half an hour in chat.
 
-**Денис:** Спасибо, передам. Резюмируем приоритеты с вашей стороны: Excel-выгрузка, мобильная вьюшка для склада, учёт серийных номеров.
+**Denis:** Thanks, I'll pass it along. Recap of your priorities: Excel export, mobile warehouse view, serial-number tracking.
 
-**Виктор:** В этом порядке.
+**Viktor:** In that order.
 
-**Денис:** До связи на следующей неделе.
+**Denis:** Talk next week.

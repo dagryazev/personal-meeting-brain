@@ -1,30 +1,30 @@
 # Daily Standup
 
-**Дата:** 2026-04-14
-**Участники:** Денис, Аня, Марк, Лёша
+**Date:** 2026-04-14
+**Attendees:** Denis, Anya, Mark, Lyosha
 
 ---
 
-**Денис:** Поехали. Аня, ты первая.
+**Denis:** Let's go. Anya, you're first.
 
-**Аня:** Вчера закончила инструментирование Redis Streams — метрики льются в Grafana, дашборд "queues-overview" обновлён. Заметила интересное: пиковая нагрузка не вечером, как мы думали, а в 11 утра — это совпадает с автоматической синхронизацией складов у двух крупных клиентов. Сегодня начну ресёрч по архивации данных.
+**Anya:** Yesterday I finished the Redis Streams instrumentation — metrics are flowing into Grafana, the "queues-overview" dashboard is live. Interesting find: peak load is not in the evening as we thought, but at 11am — that lines up with the automatic warehouse sync from two of our largest customers. Today I'm starting the data-archival research.
 
-**Денис:** Окей. Перенеси в Slack ссылку на дашборд, чтобы все могли смотреть.
+**Denis:** Okay. Post the dashboard link in Slack so everyone can watch.
 
-**Аня:** Сделаю.
+**Anya:** Will do.
 
-**Марк:** Я заканчиваю первый шаг wizard'а — приветствие и выбор отрасли. Сегодня перейду на второй шаг, импорт. Сегодня же — фикс Safari, он быстрый, надеюсь.
+**Mark:** I'm finishing wizard step 1 — welcome + industry select. Today I move on to step 2, import. And the Safari fix in parallel — it's quick, hopefully.
 
-**Денис:** Бэйков нет?
+**Denis:** Any blockers?
 
-**Марк:** Один: на тач-устройствах прогресс-бар прыгает на pixel-level, это особенность Safari. Но это полировка, не блокер.
+**Mark:** One: on touch devices the progress bar jitters at the pixel level — a Safari quirk. It's polish, not a blocker.
 
-**Лёша:** Я починил алёрт, который вчера ложно срабатывал в 4 утра — пороговое значение было задано в байтах вместо мегабайтов, оттого триггерился каждый день. Извинения дежурным. Сегодня — настройка ретенции логов, у нас в Loki накапливается по 200 ГБ в неделю, это много.
+**Lyosha:** I fixed yesterday's false-positive 4am alert — the threshold was set in bytes instead of megabytes, so it tripped every day. Apologies to oncall. Today: log-retention tuning. We're accumulating 200 GB a week in Loki, that's a lot.
 
-**Денис:** Спасибо. У меня — встречаюсь с двумя потенциальными клиентами, демо в 14:00 и 16:00. Если кто-то услышит, что я ругаюсь в кабинете — это не вам.
+**Denis:** Thanks. On me — two prospect demos at 14:00 and 16:00. If anyone hears me cursing in the office, it's not at you.
 
-**Аня:** Блокер есть. Я не могу получить read-only доступ к prod-БД для ресёрча по архивации. Лёша, можешь помочь?
+**Anya:** I have a blocker. I can't get read-only access to the prod DB for the archival research. Lyosha, can you help?
 
-**Лёша:** Сегодня сделаю отдельную read-replica с ограниченными правами. Часа на два работы.
+**Lyosha:** I'll spin up a read-replica with restricted permissions today. Should take a couple of hours.
 
-**Денис:** Принято. До завтра.
+**Denis:** Got it. Until tomorrow.

@@ -1,52 +1,52 @@
 # Incident Postmortem — Production DB Outage
 
-**Дата:** 2026-05-02
-**Инцидент:** INC-2026-0058
-**Длительность:** 47 минут (01:14 — 02:01 UTC, 2026-05-01)
-**Участники постмортема:** Лёша (incident commander), Аня, Денис, Марк
+**Date:** 2026-05-02
+**Incident:** INC-2026-0058
+**Duration:** 47 minutes (01:14 — 02:01 UTC, 2026-05-01)
+**Postmortem attendees:** Lyosha (incident commander), Anya, Denis, Mark
 
 ---
 
-## Краткое описание
+## Summary
 
-В ночь с 30 апреля на 1 мая prod-инстанс PostgreSQL стал недоступен с ошибкой "no space left on device". API возвращал 503 для всех write-операций; read-операции деградировали из-за невозможности обновить кеш. Пострадали все клиенты в зонах EU и US-East. Recovery — увеличение диска через консоль провайдера и принудительный VACUUM FULL на двух таблицах.
+During the night of April 30 to May 1, the production PostgreSQL instance became unavailable with "no space left on device". The API returned 503 for all write operations; reads degraded because the cache couldn't refresh. All customers in EU and US-East regions were affected. Recovery: raise the disk size via the provider console and force-VACUUM FULL on two tables.
 
 ## Timeline (UTC)
 
-- **00:58** — внутренний алёрт "disk_usage > 92%" сработал, ушёл в Slack #ops. Никто не отреагировал ночью.
-- **01:14** — первый клиентский алёрт через статус-страницу: write-операции возвращают 503.
-- **01:16** — оповещение PagerDuty подняло Лёшу.
-- **01:24** — Лёша подтверждает диагноз: disk full. Принимает решение увеличивать диск, а не делать emergency VACUUM, т.к. VACUUM требует свободное место.
-- **01:31** — диск увеличен с 500 ГБ до 1 ТБ. PostgreSQL не восстанавливается автоматически — процесс висит на recovery.
-- **01:42** — Лёша делает рестарт инстанса. Recovery занимает 11 минут.
-- **01:53** — БД доступна, но запросы медленные. Запускаем VACUUM FULL на двух самых больших таблицах.
-- **02:01** — производительность нормализуется, инцидент закрыт.
+- **00:58** — internal alert "disk_usage > 92%" fired into the Slack #ops channel. No one reacted at night.
+- **01:14** — first customer alert via status page: writes returning 503.
+- **01:16** — PagerDuty escalated to Lyosha.
+- **01:24** — Lyosha confirms diagnosis: disk full. Decides to grow the disk rather than emergency-VACUUM (which needs free space).
+- **01:31** — disk grown from 500 GB to 1 TB. PostgreSQL does not auto-recover — the process hangs on recovery.
+- **01:42** — Lyosha restarts the instance. Recovery takes 11 minutes.
+- **01:53** — DB available but queries are slow. We run VACUUM FULL on the two largest tables.
+- **02:01** — performance returns to normal, incident closed.
 
-## Что пошло хорошо
+## What went well
 
-- PagerDuty сработал.
-- Лёша принял решение по диску за 10 минут — не самое быстрое, но без паники.
-- Recovery PostgreSQL отработал без потери данных.
-- Клиентская статус-страница обновилась автоматически через health-check.
+- PagerDuty fired.
+- Lyosha decided on the disk path within 10 minutes — not the fastest, but no panic.
+- PostgreSQL recovery completed with no data loss.
+- The customer status page updated automatically via the health check.
 
-## Что пошло плохо
+## What went badly
 
-- **Алёрт ушёл в неправильный канал.** "disk_usage > 92%" триггерится в #ops, который ночью никто не смотрит. Page должен был быть сразу.
-- **Прогноз заполнения диска был.** Аня в ретроспективе спринта 3 (2026-04-25) предупреждала про рост БД. План был — ресёрч в спринт 4. Инцидент случился раньше плана.
-- **VACUUM FULL занял лишние 8 минут.** Можно было запустить parallel-vacuum, но никто не помнил синтаксиса под давлением.
+- **Alert went to the wrong channel.** "disk_usage > 92%" pages into #ops which is unwatched at night. It should have paged immediately.
+- **The disk growth was foreseen.** Anya flagged DB growth in the Sprint 3 retro (2026-04-25). The plan was to research in sprint 4. The incident happened before the plan.
+- **VACUUM FULL cost an extra 8 minutes.** We could have run parallel-vacuum, but under pressure no one remembered the syntax.
 
-## Корневая причина
+## Root cause
 
-Технически — переполнение диска из-за быстрого роста таблицы `events`. Системно — мы знали о проблеме, но запланировали разбор слишком поздно. Capacity-planning не было автоматизирован: рост в 40 ГБ за квартал был замечен только в ретро.
+Technically — disk exhaustion driven by fast growth of the `events` table. Systemically — we knew about the problem but scheduled the work too late. Capacity planning wasn't automated: a 40 GB/quarter growth was noticed only in retro.
 
 ## Action items
 
-1. **[Лёша, до 2026-05-04]** Переключить алёрт "disk_usage > 85%" с #ops на PagerDuty.
-2. **[Аня + Лёша, до 2026-05-08]** Архивировать события старше 90 дней в холодное S3-хранилище. Не ждать конца спринта.
-3. **[Лёша, до 2026-05-15]** Добавить ежемесячный capacity-review с прогнозом на 90 дней по диску, RAM, CPU.
-4. **[Аня, до 2026-05-12]** Подготовить runbook для emergency-VACUUM с готовыми командами.
-5. **[Денис, до 2026-05-06]** Сообщить пострадавшим клиентам — короткий retroreport через support-канал. Не извинение, а описание + что меняется.
+1. **[Lyosha, by 2026-05-04]** Reroute the "disk_usage > 85%" alert from #ops to PagerDuty.
+2. **[Anya + Lyosha, by 2026-05-08]** Archive events older than 90 days to S3 cold storage. Do not wait for sprint boundary.
+3. **[Lyosha, by 2026-05-15]** Add a monthly capacity review with a 90-day forecast for disk, RAM, CPU.
+4. **[Anya, by 2026-05-12]** Prepare an emergency-VACUUM runbook with ready-to-run commands.
+5. **[Denis, by 2026-05-06]** Send affected customers a short retro-report via the support channel. Not an apology — a description plus what changes.
 
-## Дополнительно
+## Additional notes
 
-Никаких финансовых компенсаций по SLA не положено — выходим из 99.5% месячного бюджета (47 минут вписываются), но это близко. В следующий месяц нужно быть особенно аккуратными.
+No SLA financial credits owed — we stay within the 99.5% monthly budget (47 minutes fits), but barely. Next month we need to be extra careful.

@@ -1,45 +1,45 @@
 # Product Strategy — Q3 2026
 
-**Дата:** 2026-05-06
-**Участники:** Денис (PM), Маша (CEO), Аня (Backend lead), Соня (Design lead)
+**Date:** 2026-05-06
+**Attendees:** Denis (PM), Masha (CEO), Anya (Backend lead), Sonya (Design lead)
 
 ---
 
-**Маша:** За Q2 мы выросли в выручке на 28%, добавили 14 новых клиентов, retention — 94%. Это хорошо. Q3 я хочу провести под темой "вертикализация" — выбираем 1-2 индустрии и углубляемся.
+**Masha:** Q2 we grew revenue 28%, added 14 new customers, retention is 94%. That's good. I want Q3 themed around "verticalization" — pick 1-2 industries and go deep.
 
-**Денис:** По данным NPS и customer interview-ам, у нас две доминирующие группы пользователей: e-commerce-фулфилмент (Acme и подобные) и производственные склады (Tornado, Steelco, Vipra). У них разные требования. Е-com хочет быструю выдачу и интеграции с маркетплейсами. Производство — учёт серийных номеров, партии, сроки годности.
+**Denis:** From NPS and customer interviews we have two dominant user groups: e-commerce fulfillment (Acme and similar) and manufacturing warehouses (Tornado, Steelco, Vipra). Very different requirements. E-com wants fast pick-and-pack and marketplace integrations. Manufacturing wants serial-number tracking, batches, expiration dates.
 
-**Маша:** Какая группа быстрее закрывается?
+**Masha:** Which group closes faster?
 
-**Денис:** E-com. У нас уже почти всё, что им нужно, кроме нормальной интеграции с Ozon и Wildberries. Производственники — это полугодовой roadmap минимум.
+**Denis:** E-com. We already have most of what they need, except proper Ozon and Wildberries integrations. Manufacturing is at least a six-month roadmap.
 
-**Аня:** Технически интеграция с маркетплейсами — это две недели на каждый, если у них стабильное API. У Ozon стабильно, у WB — нестабильно. Под WB надо закладывать retry-логику и буферизацию.
+**Anya:** Technically each marketplace integration is two weeks, given a stable API. Ozon is stable, Wildberries is not. WB needs retry logic and buffering.
 
-**Маша:** Делаем e-com. Денис, сделай roadmap на квартал — три большие фичи плюс мелкие.
+**Masha:** E-com it is. Denis, draft a quarterly roadmap — three big features plus minor ones.
 
-**Денис:** Предлагаю:
-1. Интеграция с Ozon (полная, с автоматической отправкой ярлыков).
-2. Интеграция с Wildberries (базовая, без автоматизации возвратов).
-3. Excel-выгрузка с шаблонами формул — это запрашивали все три e-com клиента, не только Acme.
+**Denis:** Proposal:
+1. Ozon integration (full, with automatic label dispatch).
+2. Wildberries integration (basic, no automated returns).
+3. Excel export with formula templates — all three e-com customers asked for it, not just Acme.
 
-Плюс мелкие: переименование длинных полей, оптимизация мобильной вьюшки для склада.
+Plus minor items: rename long field labels, optimize the mobile warehouse view.
 
-**Соня:** По мобильной вьюшке — это не "мелкое". Acme и ещё двое просили отдельный интерфейс под планшеты. Нужен ресёрч и проектирование, не быстрая полировка.
+**Sonya:** The mobile view isn't "minor". Acme and two others asked for a dedicated tablet interface. It needs research and design, not quick polish.
 
-**Денис:** Согласен, перенесём в большие фичи. Тогда — Ozon, WB, Excel-выгрузка, мобильный интерфейс склада. Четыре больших.
+**Denis:** Agreed, promoting it to a major. Then: Ozon, WB, Excel export, mobile warehouse view. Four bigs.
 
-**Аня:** Четыре много. У нас в квартале реалистично закрыть 2-3.
+**Anya:** Four is a lot. Realistically we close 2-3 in a quarter.
 
-**Маша:** Что готовы дропать?
+**Masha:** What are you willing to drop?
 
-**Денис:** Wildberries. Они нестабильны, и у нас всего два клиента, кому это критично. Перенесём на Q4.
+**Denis:** Wildberries. They're unstable and only two customers really need it. Push to Q4.
 
-**Маша:** Согласна.
+**Masha:** Agreed.
 
-**Соня:** Я тогда параллельно начну исследование по производственному вертикалу — пять интервью, чтобы к Q4 понимать, что им нужно.
+**Sonya:** In parallel I'll start the research on the manufacturing vertical — five interviews so we have signal on what they need by Q4.
 
-**Маша:** Да. И — отдельная просьба к Денису: я хочу видеть еженедельные отчёты по retention и ARPU. Сейчас они раз в месяц, и я ловлю изменения с задержкой.
+**Masha:** Yes. And a separate ask of Denis: I want weekly retention and ARPU reports. Right now they're monthly and I catch shifts with a lag.
 
-**Денис:** Сделаем дашборд в Metabase, и я буду каждый понедельник пинговать сводкой.
+**Denis:** I'll build a Metabase dashboard and ping you with a summary every Monday.
 
-**Маша:** Отлично.
+**Masha:** Perfect.

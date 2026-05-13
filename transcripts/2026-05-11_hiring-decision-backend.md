@@ -1,35 +1,35 @@
 # Hiring Decision — Senior Backend Engineer
 
-**Дата:** 2026-05-11
-**Кандидат:** Илья Гордеев
-**Участники debrief'а:** Денис, Аня, Лёша, Маша
+**Date:** 2026-05-11
+**Candidate:** Ilya Gordeyev
+**Debrief attendees:** Denis, Anya, Lyosha, Masha
 
 ---
 
-**Денис:** Это финальный debrief по Илье. У нас было четыре этапа: screening (я), технический (Аня), system design (Лёша), культурное интервью (Маша). По кругу — go/no-go и пять слов почему.
+**Denis:** Final debrief on Ilya. Four stages: screening (me), technical (Anya), system design (Lyosha), culture (Masha). Round-robin: go/no-go and five words why.
 
-**Аня:** Сильное "go". Технический этап — один из лучших за последний год. Илья прошёл алгоритмическую часть быстрее времени, и его решение по реальной задаче (там был запрос про оптимизацию батч-импорта) — лучше, чем сделала бы я. Особенно понравилось, что он сам предложил альтернативу через streaming, когда я навязывала offset-pagination.
+**Anya:** Strong go. Best technical stage in the last year. Ilya finished the algo part under time, and his answer on the real-task question (a batch-import optimization) was better than I'd write. I especially liked that he proposed a streaming alternative when I was pushing offset pagination on him.
 
-**Лёша:** "Go", но с оговоркой. По system design — он отлично разложил архитектуру с очередями, но когда я спросил про мониторинг и алёртинг, ответы были общие. "Нужны метрики, дашборды, SLO". Не плохо, но без конкретики. Если возьмём — на первые полгода нужен ментор по операционной части.
+**Lyosha:** Go, with a caveat. On system design he laid out a queue-based architecture cleanly, but when I asked about monitoring and alerting his answers were generic. "Need metrics, dashboards, SLO." Not bad, but no specifics. If we hire, he'll need a mentor on the ops side for the first six months.
 
-**Маша:** "Go". На культурном интервью был открытый, спрашивал по делу про команду и про продукт. Один момент насторожил — на вопрос про конфликты в прошлой команде он ушёл в общие фразы, не привёл конкретного примера. Может быть, не хочет говорить плохо о бывших коллегах, а может — не помнит. Не критично, но хотелось бы понимать, как он работает с трением.
+**Masha:** Go. Culture interview — open, asked sharp questions about the team and the product. One flag: on the "describe a conflict with a previous team" question he stayed abstract, no concrete example. Maybe he doesn't want to badmouth former colleagues, maybe he doesn't remember. Not a deal-breaker, but I'd like to understand how he handles friction.
 
-**Денис:** Я общался с ним на screening — мотивация четкая, ищет компанию, где можно влиять на технические решения, а не выполнять тикеты. Сейчас сидит в крупной аутсорс-компании, выгорает. Это сходится с нашим контекстом.
+**Denis:** I talked to him on screening — motivation is clear, looking for a place where he can shape technical decisions rather than execute tickets. Currently at a large outsourcing firm, burning out. That fits our context.
 
-**Маша:** Финансово?
+**Masha:** Money?
 
-**Денис:** Просит 380 на руки. Это верхняя граница нашей вилки для senior. Если бы он был middle+, я бы сказал "не потянем", но на senior — оправдано.
+**Denis:** He's asking 380 net. Top of our senior band. If he were mid-plus, I'd say "can't justify". For senior, fair.
 
-**Аня:** Я готова отдать ему вторую очередь в команде после себя.
+**Anya:** I'd hand him the #2 spot in the team after me.
 
-**Лёша:** Оффер давать. Но в onboarding-плане — два месяца плотного парного программирования с Аней и обязательное shadow на одну incident-ротацию.
+**Lyosha:** Make the offer. But the onboarding plan should have two months of intense pair programming with Anya and mandatory shadow on one incident rotation.
 
-**Маша:** Согласна. Денис, готовь оффер.
+**Masha:** Agreed. Denis, prepare the offer.
 
-**Денис:** Сделаю сегодня вечером, отправим завтра утром.
+**Denis:** I'll draft it tonight, we send it tomorrow morning.
 
-**Маша:** Срок выхода?
+**Masha:** Start date?
 
-**Денис:** Илья сказал, две недели на текущей работе. Если оффер примет завтра — выход 27 мая.
+**Denis:** Ilya said two weeks at his current job. If he accepts tomorrow, start is May 27.
 
-**Маша:** Хорошо. Спасибо всем.
+**Masha:** Good. Thanks all.

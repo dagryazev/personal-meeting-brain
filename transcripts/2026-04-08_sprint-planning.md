@@ -1,36 +1,36 @@
 # Sprint Planning — Q2 Sprint 3
 
-**Дата:** 2026-04-08
-**Участники:** Денис (PM), Аня (Backend), Марк (Frontend), Соня (Design), Лёша (DevOps)
+**Date:** 2026-04-08
+**Attendees:** Denis (PM), Anya (Backend), Mark (Frontend), Sonya (Design), Lyosha (DevOps)
 
 ---
 
-**Денис:** Привет всем, открываем планирование. По итогам прошлого спринта у нас закрыто 18 сторипоинтов из 22 — два таска по интеграции с 1С перенесли. Сегодня хочу обсудить три блока: онбординг новых клиентов, фоновый ребилд аналитики и техдолг по очередям.
+**Denis:** Hi everyone, kicking off planning. From the last sprint we closed 18 of 22 story points — the two 1C integration tasks slipped. Today I want to cover three blocks: new customer onboarding, the background analytics rebuild, and queue tech debt.
 
-**Аня:** По очередям. Я смотрела на воркеры — мы упираемся в Redis Streams, когда параллельных задач больше тысячи. Предлагаю в этом спринте начать миграцию на RabbitMQ. Не весь pipeline, а только bulk-импорт товаров. Это 5 сторипоинтов.
+**Anya:** On queues. I looked at the workers — we hit Redis Streams limits once parallel jobs go above a thousand. I propose we start migrating to RabbitMQ this sprint. Not the whole pipeline, just the bulk product import. That's 5 story points.
 
-**Лёша:** Поддерживаю, но давайте сначала добавим метрики потребления памяти Redis. Без этого мы не докажем, что миграция вообще нужна — на ревью бюджета меня уже спрашивали.
+**Lyosha:** I'm in favor, but let's add memory-consumption metrics on Redis first. Without those we can't prove the migration is even necessary — the budget review already asked me about it.
 
-**Денис:** Окей, добавим один пойнт на метрики, и тогда миграция bulk-импорта — следующим этапом, не в этом спринте. В этом — только инструментирование.
+**Denis:** Okay, one point for the metrics, and then bulk-import migration is the next step, not this sprint. This sprint: instrumentation only.
 
-**Аня:** Согласна.
+**Anya:** Agreed.
 
-**Марк:** По онбордингу. Соня закончила макеты нового wizard'а, мы готовы брать в работу. Там пять шагов вместо нынешних трёх, но с прогресс-баром и возможностью пропустить. По оценке — 8 сторипоинтов.
+**Mark:** On onboarding. Sonya finished the new wizard mockups, we're ready to build. Five steps instead of the current three, but with a progress bar and a skip option. Estimate is 8 points.
 
-**Соня:** Уточню: на шаге импорта товаров есть две ветки — CSV и интеграция со складской системой. Я нарисовала только CSV-вариант, интеграции пока в research-режиме.
+**Sonya:** One clarification: the product-import step has two branches — CSV and warehouse-system integration. I only drew the CSV variant; integration is still in research mode.
 
-**Денис:** Хорошо. Тогда в спринт берём CSV-ветку, integration-вариант — на следующий после ресёрча.
+**Denis:** Good. Then we take only the CSV branch this sprint; the integration variant goes in the sprint after the research lands.
 
-**Лёша:** У меня есть тревога. Production-БД растёт быстрее, чем мы планировали — за квартал прибавилось 40 ГБ. Если ничего не делать, через два месяца упрёмся в лимит инстанса. Нужно либо архивировать старые события, либо мигрировать на больший инстанс. Оба варианта займут время.
+**Lyosha:** I have a concern. Production DB is growing faster than we planned — 40 GB added this quarter. If we do nothing, we hit the instance limit in two months. We either archive old events or migrate to a bigger instance. Both take time.
 
-**Денис:** Это критично. Берём в спринт ресёрч-таск на 2 пойнта: понять, что выгоднее, и принести в следующее планирование цифры. Аня, поможешь с оценкой объёма архивных данных?
+**Denis:** That's critical. Let's take a 2-point research task into the sprint: figure out which option is cheaper and bring numbers to the next planning. Anya, can you help estimate the archive volume?
 
-**Аня:** Да, к среде сделаю выборку.
+**Anya:** Yes, I'll have a sample by Wednesday.
 
-**Марк:** По фронту последнее — баг с экспортом отчётов в Safari, висит уже две недели. Не критично, но клиенты жалуются. Возьму 1 пойнт.
+**Mark:** Last frontend item — Safari export bug in reports, two weeks old. Not critical but customers complain. I'll take 1 point.
 
-**Денис:** Итого спринт: метрики Redis (1), wizard онбординга CSV-ветка (8), ресёрч хранения БД (2), фикс Safari (1), плюс резерв 4 пойнта на баг-фиксы. Всего 16. Сходится с нашей средней скоростью.
+**Denis:** Sprint totals: Redis metrics (1), CSV onboarding wizard (8), DB-storage research (2), Safari fix (1), plus 4-point buffer for bug fixes. 16 total. Matches our average velocity.
 
-**Соня:** Я параллельно начну integration-ветку wizard'а, чтобы к следующему спринту были макеты.
+**Sonya:** In parallel I'll start the integration-branch wizard so we have mockups ready for the next sprint.
 
-**Денис:** Отлично. Закрываем. Daily в обычное время.
+**Denis:** Great. Closing. Daily at the usual time.

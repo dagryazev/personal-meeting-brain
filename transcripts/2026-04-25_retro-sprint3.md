@@ -1,40 +1,40 @@
 # Sprint Retrospective — Q2 Sprint 3
 
-**Дата:** 2026-04-25
-**Участники:** Денис, Аня, Марк, Соня, Лёша
+**Date:** 2026-04-25
+**Attendees:** Denis, Anya, Mark, Sonya, Lyosha
 
 ---
 
-**Денис:** Закрыли 14 из 16 пойнтов. Wizard онбординга в проде, метрики Redis собираются, ресёрч по архивации почти готов. Что хорошо, что плохо, что меняем.
+**Denis:** We closed 14 of 16 points. Onboarding wizard is in prod, Redis metrics are flowing, archival research is almost done. What went well, what went badly, what we change.
 
-**Что хорошо**
+**What went well**
 
-**Марк:** Wizard сделали раньше срока, успели на дополнительный QA-проход. Соня была всё время на связи, не пришлось ждать макетов по три дня.
+**Mark:** The wizard shipped ahead of schedule, we got an extra QA pass. Sonya was always available, no waiting three days for mockups.
 
-**Соня:** Согласна, темп ревью был отличный. Я успевала отвечать в тот же день.
+**Sonya:** Agree, review pace was great. I was able to answer same-day.
 
-**Аня:** Read-replica для ресёрча — оказалось полезной не только для архивации, я там же гоняла EXPLAIN'ы и нашла два неоптимальных запроса. Один из них — топ-1 по медленности в нашем APM. Лёша молодец, что быстро сделал доступ.
+**Anya:** The read-replica for research — turned out useful beyond archival, I also ran EXPLAINs there and found two unoptimized queries. One of them is the top-1 slowest in our APM. Credit to Lyosha for setting up access quickly.
 
-**Что плохо**
+**What went badly**
 
-**Лёша:** Фикс Safari растянулся с одного пойнта до трёх. Марк, без обиды.
+**Lyosha:** The Safari fix stretched from one point to three. Mark, no offense.
 
-**Марк:** Без обид. Я недооценил — там оказался не один баг, а три разных, и пришлось переделывать рендер прогресс-бара. Урок для меня: в "лёгких" багах Safari закладываю х3 на оценку.
+**Mark:** None taken. I underestimated — turned out to be three different bugs, not one, and I had to redo the progress-bar render. Lesson learned: for "easy" Safari bugs I budget 3x on the estimate.
 
-**Денис:** Фиксируем как командный практический урок.
+**Denis:** Logged as a team learning.
 
-**Аня:** Меня беспокоит, что мы не успели разобраться с архивацией. У нас была оценка 2 пойнта на ресёрч, ушло 5. Я недооценила, насколько криво написаны старые миграции — пришлось разобраться, что фактически лежит в каждой таблице, прежде чем планировать архивацию.
+**Anya:** It worries me that we didn't finish archival. We estimated the research at 2 points, it took 5. I underestimated how messy the old migrations are — I had to figure out what each table actually holds before I could plan archival.
 
-**Денис:** Это не "плохо", это "сложнее, чем казалось". В следующий спринт продолжим, и принесём в планинг конкретный план с цифрами.
+**Denis:** Not "badly" — "harder than it looked". Next sprint we continue and bring a concrete plan with numbers.
 
-**Соня:** У меня плохое — я не успела начать integration-ветку wizard'а, потому что всё время уходило на ревью CSV-ветки. Это значит, что в следующем спринте мы будем ждать макетов.
+**Sonya:** My bad — I never started the integration-branch wizard because all my time went into reviewing the CSV branch. Which means next sprint we'll be waiting on mockups.
 
-**Денис:** Принято. В следующем спринте — отдельный слот у Сони на проектирование, защищённый от ревью-запросов.
+**Denis:** Got it. Next sprint, Sonya gets a dedicated design block, protected from review requests.
 
-**Что меняем**
+**What we change**
 
-1. Все оценки фронт-багов в Safari/мобильных браузерах — х3 от первичной оценки, как буфер.
-2. У дизайна — защищённое время на проектирование (минимум 2 дня в неделю), ревью складируем в один батч.
-3. Перед началом любой работы с историческими данными — exploratory-сессия, не в рамках имплементационного пойнта.
+1. All estimates for Safari / mobile-browser frontend bugs — 3x the initial estimate, as buffer.
+2. Design gets protected design time (min 2 days per week); reviews are batched.
+3. Before any work on historical data — an exploratory session, not counted as an implementation point.
 
-**Денис:** Зафиксировал. Спасибо всем.
+**Denis:** Recorded. Thanks all.

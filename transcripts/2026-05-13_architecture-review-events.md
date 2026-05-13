@@ -1,55 +1,55 @@
 # Architecture Review — Event Store Migration
 
-**Дата:** 2026-05-13
-**Тема:** Миграция событий из PostgreSQL в выделенное event-хранилище
-**Участники:** Аня, Лёша, Денис
+**Date:** 2026-05-13
+**Topic:** Migrating events out of PostgreSQL into a dedicated event store
+**Attendees:** Anya, Lyosha, Denis
 
 ---
 
-**Аня:** Сегодня — финальный review до того, как я подам RFC в команду. После инцидента 1 мая стало понятно: события не должны жить в нашей основной БД. Мы храним там и транзакционные данные клиентов, и аналитический поток событий — это разные паттерны нагрузки.
+**Anya:** Today is the final review before I file the RFC with the team. After the May 1 incident it's clear: events shouldn't live in our main DB. We keep transactional customer data and the analytical event stream in the same place — they have different load patterns.
 
-**Лёша:** Согласен. Какие опции рассматривала?
+**Lyosha:** Agreed. Which options did you consider?
 
-**Аня:** Три. Первая — ClickHouse, второй — TimescaleDB, третья — оставить PostgreSQL, но в отдельном инстансе с агрессивной партицированием по времени.
+**Anya:** Three. First — ClickHouse, second — TimescaleDB, third — keep PostgreSQL but on a separate instance with aggressive time partitioning.
 
-**Денис:** Критерии?
+**Denis:** Criteria?
 
-**Аня:**
-1. Скорость записи. У нас сейчас пиковая нагрузка ~2000 событий/сек, к концу года планируем 5000.
-2. Скорость аналитических запросов. Сейчас запрос "события клиента X за месяц" занимает 8-12 секунд.
-3. Операционная сложность. Чем меньше нового стека, тем лучше.
-4. Стоимость инфраструктуры.
+**Anya:**
+1. Write throughput. Peak today is ~2000 events/sec, end-of-year target 5000.
+2. Analytical query speed. Today "events for customer X for a month" takes 8–12 seconds.
+3. Operational complexity. The less new stack, the better.
+4. Infra cost.
 
-**Лёша:** Расскажи по каждому.
+**Lyosha:** Walk us through each.
 
-**Аня:** ClickHouse — выигрывает по скорости аналитики в 50-100 раз, выигрывает по записи в 5-10 раз. Проигрывает по операционной сложности: новый движок, нужен бэкап-процесс, нужно учиться. TimescaleDB — это PostgreSQL-расширение, операционно почти бесплатно, аналитика быстрее в 5-10 раз, запись похожа на обычный PG. Третий вариант (отдельный PG) — самый простой, но не решает проблему долгосрочно.
+**Anya:** ClickHouse — wins on analytical speed by 50–100x, wins on writes by 5–10x. Loses on operational complexity: new engine, new backup process, learning curve. TimescaleDB is a PostgreSQL extension, operationally almost free, analytics 5–10x faster, writes close to vanilla PG. Third option (separate PG) — simplest but doesn't fix the long-term problem.
 
-**Денис:** Что предлагаешь?
+**Denis:** Your pick?
 
-**Аня:** TimescaleDB. Операционно мы не готовы к ClickHouse — нет специалиста, и Лёша единственный devops. Запас по росту на TimescaleDB — года на полтора, что нам достаточно.
+**Anya:** TimescaleDB. Operationally we're not ready for ClickHouse — no specialist, Lyosha is the only devops. Headroom on Timescale is ~1.5 years of growth, which is enough.
 
-**Лёша:** Поддерживаю. Я знаком с PG-операциями, расширение не должно создать сюрпризов.
+**Lyosha:** Concur. I know PG operations; the extension shouldn't surprise me.
 
-**Денис:** Сколько займёт миграция?
+**Denis:** How long is the migration?
 
-**Аня:** Чистый proof-of-concept — две недели. Полная миграция с переключением трафика и поэтапной двойной записью — два месяца, я бы заложила три. Это если без приключений.
+**Anya:** Clean proof-of-concept — two weeks. Full migration with traffic switchover and staged dual-write — two months, I'd budget three. That's no-surprises pace.
 
-**Лёша:** Каков риск регрессии?
+**Lyosha:** Regression risk?
 
-**Аня:** Низкий, если правильно сделаем двойную запись. План: новые события пишутся параллельно в PG и Timescale, и в течение месяца сверяем counts. Когда уверены — переключаем чтение на Timescale, через ещё месяц выключаем запись в PG.
+**Anya:** Low, if we do dual-write right. Plan: new events write to PG and Timescale in parallel; we reconcile counts for a month. Once we're sure, flip reads to Timescale; one more month, then disable PG writes.
 
-**Денис:** Какие компромиссы по TimescaleDB?
+**Denis:** Trade-offs of TimescaleDB?
 
-**Аня:** Минусы: vendor lock — это коммерческий продукт, бесплатный self-hosted имеет ограничения. Continuous aggregates требуют переосмысления некоторых запросов. И — некоторые JOIN-ы между Timescale-таблицами и обычными PG-таблицами могут быть медленнее, если данные на разных инстансах.
+**Anya:** Downsides: vendor lock — it's a commercial product, the free self-hosted has limits. Continuous aggregates require rethinking some queries. And — some JOINs between Timescale tables and regular PG tables can be slow if the data lives on different instances.
 
-**Лёша:** Если мы на одном инстансе, JOIN-ы работают нормально. Это критично — давайте сразу разместим Timescale рядом с основной БД, без отдельного инстанса для начала.
+**Lyosha:** On the same instance, JOINs work fine. Important — let's colocate Timescale next to the main DB initially, no separate instance.
 
-**Аня:** Согласна. Это упрощает первый этап.
+**Anya:** Agreed. That simplifies phase one.
 
-**Денис:** Бюджет?
+**Denis:** Budget?
 
-**Аня:** Дополнительная нагрузка на инстанс — +30% RAM/диска. По цене ~80 евро в месяц на текущем плане.
+**Anya:** Extra load on the instance — +30% RAM/disk. About €80/month at the current plan.
 
-**Денис:** Принято. Пиши RFC, в понедельник обсуждаем с командой, потом — план миграции на ближайшие два спринта.
+**Denis:** Approved. Write the RFC, on Monday we discuss with the team, then a migration plan for the next two sprints.
 
-**Аня:** Сделаю.
+**Anya:** Done.
