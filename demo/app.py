@@ -210,38 +210,52 @@ if ask and query.strip():
         )
         st.stop()
 
-    t_search = time.perf_counter()
-    conn = _open_conn()
-    try:
-        hits = search.search(
-            conn,
-            query,
-            top_k=top_k,
-            date_from=date_from_str,
-            date_to=date_to_str,
-        )
-    finally:
-        conn.close()
-    search_ms = (time.perf_counter() - t_search) * 1000
-
     st.divider()
-    st.subheader("Answer")
-    st.caption(
-        f"Fragments retrieved: {len(hits)} · search took {search_ms:.0f} ms · "
-        f"{decision.remaining_minute}/min, "
-        f"{decision.remaining_hour}/hour, {decision.remaining_day}/day left from this IP"
-    )
 
+    # Reserve layout slots BEFORE the status block so the streamed answer
+    # renders in the normal flow (below the status bar), not nested inside it.
+    status_slot = st.empty()
+    header_slot = st.empty()
+    info_slot = st.empty()
     answer_placeholder = st.empty()
+    gen_caption_slot = st.empty()
 
-    t_gen = time.perf_counter()
-    full_answer = ""
-    for piece in _stream_answer(query, hits):
-        full_answer += piece
-        answer_placeholder.markdown(full_answer)
-    gen_ms = (time.perf_counter() - t_gen) * 1000
+    with status_slot.status("Searching transcripts…", expanded=False) as status:
+        t_search = time.perf_counter()
+        conn = _open_conn()
+        try:
+            hits = search.search(
+                conn,
+                query,
+                top_k=top_k,
+                date_from=date_from_str,
+                date_to=date_to_str,
+            )
+        finally:
+            conn.close()
+        search_ms = (time.perf_counter() - t_search) * 1000
 
-    st.caption(f"Generation took {gen_ms:.0f} ms")
+        header_slot.subheader("Answer")
+        info_slot.caption(
+            f"Fragments retrieved: {len(hits)} · search took {search_ms:.0f} ms · "
+            f"{decision.remaining_minute}/min, "
+            f"{decision.remaining_hour}/hour, {decision.remaining_day}/day left from this IP"
+        )
+
+        status.update(label=f"Generating answer ({len(hits)} fragments)…")
+
+        t_gen = time.perf_counter()
+        full_answer = ""
+        for piece in _stream_answer(query, hits):
+            full_answer += piece
+            answer_placeholder.markdown(full_answer)
+        gen_ms = (time.perf_counter() - t_gen) * 1000
+
+        gen_caption_slot.caption(f"Generation took {gen_ms:.0f} ms")
+        status.update(
+            label=f"Done in {(search_ms + gen_ms) / 1000:.1f}s",
+            state="complete",
+        )
 
     if hits:
         st.subheader("Sources")
