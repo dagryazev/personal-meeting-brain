@@ -1,0 +1,15 @@
+{"query": "What did Anya say about the Redis Streams limits and the RabbitMQ migration?", "expected_paths": ["transcripts/2026-04-08_sprint-planning.md"]}
+{"query": "What did we decide about the database disk space and archiving events?", "expected_paths": ["transcripts/2026-05-02_incident-postmortem-db.md", "transcripts/2026-04-08_sprint-planning.md"]}
+{"query": "Postmortem of the May production database outage", "expected_paths": ["transcripts/2026-05-02_incident-postmortem-db.md"]}
+{"query": "How did the hiring debrief for the senior backend engineer go?", "expected_paths": ["transcripts/2026-05-11_hiring-decision-backend.md"]}
+{"query": "Why did we pick TimescaleDB over ClickHouse for the event store?", "expected_paths": ["transcripts/2026-05-13_architecture-review-events.md"]}
+{"query": "Top three pains Acme Logistics mentioned in the customer interview", "expected_paths": ["transcripts/2026-04-18_customer-interview-acme.md"]}
+{"query": "What action items came out of the database incident postmortem and who owns them?", "expected_paths": ["transcripts/2026-05-02_incident-postmortem-db.md"]}
+{"query": "Which industry did we pick to focus on for Q3 — e-commerce or manufacturing?", "expected_paths": ["transcripts/2026-05-06_product-strategy-q3.md"]}
+{"query": "What did Mark learn about estimating Safari frontend bugs?", "expected_paths": ["transcripts/2026-04-25_retro-sprint3.md"]}
+{"query": "Which meetings touched on long-term product strategy and roadmap?", "expected_paths": ["transcripts/2026-05-06_product-strategy-q3.md"]}
+{"query": "What is the onboarding plan for Ilya if we make the offer?", "expected_paths": ["transcripts/2026-05-11_hiring-decision-backend.md"]}
+{"query": "When was the disk_usage alert misrouted and what's the fix?", "expected_paths": ["transcripts/2026-05-02_incident-postmortem-db.md"]}
+{"query": "Excel export with formula templates — who asked for it?", "expected_paths": ["transcripts/2026-04-18_customer-interview-acme.md", "transcripts/2026-05-06_product-strategy-q3.md"]}
+{"query": "Daily standup on April 14 — what were Anya's findings on peak queue load?", "expected_paths": ["transcripts/2026-04-14_daily-standup.md"]}
+{"query": "Dual-write migration plan for the event store", "expected_paths": ["transcripts/2026-05-13_architecture-review-events.md"]}

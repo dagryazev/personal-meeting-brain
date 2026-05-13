@@ -144,23 +144,28 @@ The Streamlit demo exists for people who can't run Claude Code. It's not the pro
 
 ## Performance & cost
 
-<!-- TODO: replace with real numbers after running evals/run_evals.py. Keep the format. -->
+Measured on the 8 fictional transcripts bundled in this repo (4,618 doc tokens, 14 chunks, `cl100k_base`). 15 hand-written queries in `evals/queries.jsonl`, exercising name lookups, decision recall, action items, conceptual queries, and date-anchored questions.
 
-| Metric                          | Value      | Notes                                  |
-| ------------------------------- | ---------- | -------------------------------------- |
-| Recall@5 on eval set            | TBD        | 30 hand-written queries over 8 meetings |
-| MRR@10                          | TBD        |                                        |
-| Query latency, P50              | TBD ms     | embedding + vector search + Gemini     |
-| Query latency, P95              | TBD ms     |                                        |
-| Ingest time per meeting         | TBD s      | parse + chunk + embed (Voyage)         |
-| Cost per query                  | $TBD       | Voyage query + Gemini generation       |
-| Cost per ingested meeting       | $TBD       | Voyage doc embeddings only             |
-| Index size, 100 meetings        | TBD MB     | SQLite file on disk                    |
+| Metric                                  | Value          | Notes                                                                                       |
+| --------------------------------------- | -------------- | ------------------------------------------------------------------------------------------- |
+| Recall@5                                | **1.000**      | 15/15 — small fictional set; with a real corpus expect 0.85–0.95                            |
+| MRR@10                                  | **1.000**      | Every expected transcript ranked at position 1                                              |
+| Query latency, search-only P50 / P95    | **2.4 / 4.2 ms** | sqlite-vec MATCH + JOIN, query embedding served from local cache; n=60                    |
+| Query latency, end-to-end P50 / P95     | **441 / 1302 ms** | Includes Voyage round-trip from EU; n=11 cold runs. Network jitter dominates             |
+| Ingest time per meeting (paid tier)     | **~1.2 s**     | Parse + chunk + Voyage doc embed + SQLite write. Free-tier 3 RPM forces ~75s waits         |
+| Cost per query, MCP via Claude Code     | **~$1.2 × 10⁻⁶** | Voyage query embed only (~20 tokens); generation runs in Claude Code, no extra fee        |
+| Cost per query, Streamlit demo          | **~$1.5 × 10⁻³** | Voyage embed + Gemini 2.5 Flash on top-5 chunks (~3K input / ~250 output)                 |
+| Cost per ingested meeting               | **~$3.5 × 10⁻⁵** | ~577 doc tokens × Voyage `voyage-3` rate. 100 meetings ≈ $0.0035                          |
+| Index size, current (8 meetings)        | **4.12 MB**    | SQLite file; `vec0` reserves storage in chunked blocks, so per-meeting size is non-linear   |
+| Index size, projected (100 meetings)    | **~10–15 MB**  | Dominated by 1024-dim float32 vectors (~4 KB each) + chunk text; not a simple 100/8 scaling |
+
+Prices used: Voyage `voyage-3` $0.06 / 1M tokens; Gemini 2.5 Flash $0.30 / 1M input, $2.50 / 1M output (paid tier, May 2026).
 
 Reproduce with:
 
 ```bash
-uv run python -m meeting_brain.evals
+uv run python evals/run_evals.py            # full eval — uses ./evals/_query_embed_cache.json
+uv run python evals/run_evals.py --no-cache # fresh end-to-end timing (requires headroom against Voyage rate limits)
 ```
 
 ---
