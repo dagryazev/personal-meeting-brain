@@ -1,0 +1,12 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Streamlit's built-in health endpoint. Railway probes this to confirm
+# the service is alive before routing traffic to it.
+healthcheckPath = "/_stcore/health"
+healthcheckTimeout = 30

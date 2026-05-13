@@ -74,3 +74,43 @@ See [`src/meeting_brain/db.py`](src/meeting_brain/db.py) for the full SQLite sch
 ## Embeddings
 
 Embeddings come from Voyage AI's `voyage-3` model (1024 dimensions, multilingual). Documents are embedded with `input_type="document"` at ingest time; queries with `input_type="query"` at search time. This asymmetric encoding gives noticeably better retrieval than treating queries as documents.
+
+## Demo (Streamlit + Gemini, deployable to Railway)
+
+There is a self-contained web demo that showcases the RAG loop end-to-end: type a question, see Gemini's answer streamed in, with all source chunks expandable below. Useful for showing the system to people without giving them Claude Code access.
+
+### Run the demo locally
+
+```bash
+# 1. Configure keys
+cp .env.example .env
+# Edit .env: set VOYAGE_API_KEY and GEMINI_API_KEY
+
+# 2. Ingest the bundled demo transcripts (8 fictional meetings)
+MEETING_BRAIN_TRANSCRIPTS_DIR=$PWD/demo/transcripts uv run meeting-brain-ingest
+
+# 3. Launch
+uv run streamlit run demo/app.py
+```
+
+Streamlit opens on `http://localhost:8501`.
+
+### Deploy the demo to Railway
+
+The repo ships a `Dockerfile` and `railway.toml` configured for Railway:
+
+1. **Create a new project** in Railway and connect this GitHub repo.
+2. **Set environment variables** in the service settings:
+   - `VOYAGE_API_KEY` — your Voyage AI key
+   - `GEMINI_API_KEY` — your Google AI Studio (Gemini) key
+3. **Add a Volume** mounted at `/app/data` so the SQLite index survives redeploys (~5–20 MB per few hundred meetings).
+4. Click deploy. The container will:
+   - Build the image (multi-stage Dockerfile with `uv`)
+   - Ingest `demo/transcripts/` on startup (idempotent via content-hash)
+   - Launch Streamlit on the `$PORT` Railway provides
+
+Public URL appears once the health check (`/_stcore/health`) passes.
+
+### Demo transcripts
+
+The 8 transcripts in `demo/transcripts/` are entirely fictional (made-up startup "Lumora", invented people) and exist solely to demonstrate the retrieval quality. Replace them with your own when you have real data — and remember to update `.gitignore` if those transcripts are private.

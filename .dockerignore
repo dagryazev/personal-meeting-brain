@@ -1,0 +1,16 @@
+.git
+.gitignore
+.venv
+.env
+.env.local
+.pytest_cache
+.ruff_cache
+**/__pycache__
+*.egg-info
+data/*.db
+data/*.db-*
+transcripts/*.md
+!demo/transcripts/*.md
+.mcp.json
+tests
+README.md
