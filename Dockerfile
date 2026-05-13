@@ -13,12 +13,12 @@ WORKDIR /app
 
 # Install dependencies first (cached as long as pyproject.toml / uv.lock don't change).
 COPY pyproject.toml uv.lock ./
-RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
+RUN --mount=type=cache,id=s/cc93973d-0370-4023-b712-a132aee80d8a-uv-cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --no-install-project
 
 # Install the project itself.
 COPY src ./src
-RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
+RUN --mount=type=cache,id=s/cc93973d-0370-4023-b712-a132aee80d8a-uv-cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 
